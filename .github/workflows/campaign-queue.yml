@@ -1,0 +1,30 @@
+name: Process messaging queues
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Release scheduled campaigns
+        run: curl --fail-with-body -X POST "$APP_URL/api/campaigns/schedule" -H "Authorization: Bearer $CRON_SECRET"
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      - name: Process campaign batches
+        run: |
+          for i in 1 2 3 4 5 6; do
+            curl --fail-with-body -X POST "$APP_URL/api/campaigns/process" -H "Authorization: Bearer $CRON_SECRET" || exit 1
+          done
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      - name: Process automation journeys
+        run: |
+          for i in 1 2 3; do
+            curl --fail-with-body -X POST "$APP_URL/api/automation/process" -H "Authorization: Bearer $CRON_SECRET" || exit 1
+          done
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}

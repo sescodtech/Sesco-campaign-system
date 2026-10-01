@@ -1,0 +1,8 @@
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { getCurrentContext } from "@/lib/auth/context";
+import { createClient } from "@/lib/supabase/server";
+const schema=z.object({name:z.string().min(2).max(100),description:z.string().max(240).optional(),mapping:z.record(z.string(),z.string()),headerRow:z.number().int().positive().default(1)});
+export async function POST(request:Request){const context=await getCurrentContext();if(!context?.membership||!context.user)return NextResponse.json({error:"Authentication required"},{status:401});const parsed=schema.safeParse(await request.json());if(!parsed.success)return NextResponse.json({error:"Invalid mapping profile"},{status:400});const supabase=await createClient();const orgId=context.membership.organization_id as string;const {data,error}=await supabase.from("import_mapping_profiles").upsert({organization_id:orgId,created_by:context.user.id,...parsed.data},{onConflict:"organization_id,name"}).select("id,name,mapping").single();if(error)return NextResponse.json({error:error.message},{status:400});return NextResponse.json(data);}
+
+export async function GET(){const context=await getCurrentContext();if(!context?.membership)return NextResponse.json([],{status:401});const supabase=await createClient();const orgId=context.membership.organization_id as string;const {data,error}=await supabase.from("import_mapping_profiles").select("id,name,mapping,header_row").eq("organization_id",orgId).order("updated_at",{ascending:false});if(error)return NextResponse.json({error:error.message},{status:400});return NextResponse.json(data||[]);}

@@ -1,0 +1,9 @@
+"use client";
+import { Bell, CircleHelp, Search, LogOut } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { logout } from "@/app/(dashboard)/logout-action";
+const labels: Record<string,string>={dashboard:"Overview",campaigns:"Campaigns",contacts:"Contacts",templates:"Templates",automation:"Automation",analytics:"Analytics",integrations:"Integrations",team:"Team & Roles",audit:"Audit Logs",settings:"Settings"};
+export function Topbar({ title, email }: { title: string; email: string }) {
+  const pathname=usePathname(); const segment=pathname.split("/").filter(Boolean)[0]||"dashboard"; const pageTitle=labels[segment]||title;
+  return <header className="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-slate-200 bg-white/95 px-5 backdrop-blur lg:px-8"><div><div className="text-xs font-medium text-slate-400">Workspace /</div><h1 className="text-lg font-semibold tracking-[-.02em]">{pageTitle}</h1></div><div className="flex items-center gap-2"><button className="hidden h-10 w-64 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-400 md:flex"><Search className="size-4"/>Search workspace</button><button className="hidden size-10 place-items-center rounded-xl border border-slate-200 sm:grid"><CircleHelp className="size-4"/></button><button className="hidden size-10 place-items-center rounded-xl border border-slate-200 sm:grid"><Bell className="size-4"/></button><div className="ml-1 hidden text-right md:block"><div className="max-w-40 truncate text-sm font-semibold">{email}</div><div className="text-xs text-slate-400">Signed in</div></div><form action={logout}><button className="grid size-10 place-items-center rounded-xl border border-slate-200 hover:bg-slate-50" aria-label="Sign out"><LogOut className="size-4"/></button></form></div></header>;
+}

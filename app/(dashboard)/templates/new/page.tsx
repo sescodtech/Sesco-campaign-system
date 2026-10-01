@@ -1,0 +1,2 @@
+import { TemplateBuilder } from "@/components/templates/template-builder";
+export default function NewTemplatePage(){return <div className="space-y-6"><div><p className="eyebrow">Templates</p><h1 className="mt-1 text-2xl font-bold">Create email template</h1><p className="mt-1 text-sm text-slate-500">Build reusable, personalized campaign content with desktop and mobile preview.</p></div><TemplateBuilder/></div>}
